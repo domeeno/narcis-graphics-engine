@@ -1,24 +1,32 @@
+#include <GL/gl.h>
 #include <cstdlib>
-#include <iostream>
-#include <ostream>
-#include <string>
+#include <GLFW/glfw3.h>
 
-#include "Store.h"
-
-using std::endl;
 
 int main(int argc, char **argv) {
-  std::cout << "You're openning up a new store in town. Name it: " << endl;
+  GLFWwindow *window;
 
-  std::string storeName;
+  if(!glfwInit())
+    return EXIT_FAILURE;
 
-  std::cin >> storeName;
+  window = glfwCreateWindow(640, 480, "Hello World", NULL, NULL);
 
-  Store* store = new Store(storeName);
+  if (!window) {
+    glfwTerminate();
+    return EXIT_FAILURE;
+  }
 
-  store->printStoreName();
+  glfwMakeContextCurrent(window);
 
-  delete store;
-      
-  return EXIT_SUCCESS;
+  while(!glfwWindowShouldClose(window)) {
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    glfwSwapBuffers(window);
+
+    glfwPollEvents();
+  }
+
+  glfwTerminate();
+
+  return 0;
 }
