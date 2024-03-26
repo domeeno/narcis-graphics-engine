@@ -1,5 +1,6 @@
 #include "../include/glad/glad.h"
 #include "game.h"
+#include "shaders.h"
 #include <GL/gl.h>
 #include <GLFW/glfw3.h>
 #include <cstdlib>
@@ -40,6 +41,7 @@ int main(int argc, char **argv) {
   }
 
   glfwMakeContextCurrent(window);
+  glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
   // init GLAD to manage function pointers to OpenGL
   if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
@@ -47,9 +49,10 @@ int main(int argc, char **argv) {
     return EXIT_FAILURE;
   }
 
-  glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+  unsigned int vertexShader = init_vertex_shader();
+  unsigned int fragmentShader = init_fragment_shader();
 
-  glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+  init_shader_program(vertexShader, fragmentShader);
 
   while (!glfwWindowShouldClose(window)) {
     glClear(GL_COLOR_BUFFER_BIT);

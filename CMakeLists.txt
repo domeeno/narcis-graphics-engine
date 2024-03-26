@@ -7,6 +7,7 @@ set(SOURCES
   "${SRC_DIR}/main.cpp" 
   "${SRC_DIR}/Store.cpp" 
   "${SRC_DIR}/glad.c"
+  "${SRC_DIR}/shaders.cpp"
   "${SRC_DIR}/game.cpp"
   )
 
