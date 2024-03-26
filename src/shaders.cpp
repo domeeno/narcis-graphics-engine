@@ -56,7 +56,7 @@ unsigned int init_fragment_shader() {
   return fragmentShaderId;
 }
 
-void init_shader_program(unsigned int vertexShaderId,
+unsigned int init_shader_program(unsigned int vertexShaderId,
                          unsigned int fragmentShaderId) {
   unsigned int shaderProgramId;
   shaderProgramId = glCreateProgram();
@@ -66,6 +66,12 @@ void init_shader_program(unsigned int vertexShaderId,
   glLinkProgram(shaderProgramId);
 
   verify_program_compile(shaderProgramId);
+
+  glUseProgram(shaderProgramId);
+  glDeleteShader(vertexShaderId);
+  glDeleteShader(vertexShaderId);
+
+  return shaderProgramId;
 }
 
 static void verify_shader_compile(unsigned int &shaderId) {
