@@ -3,7 +3,12 @@ cmake_minimum_required(VERSION 3.0)
 project(WallachiaStore)
 
 set(SRC_DIR "${CMAKE_CURRENT_LIST_DIR}/src")
-set(SOURCES "${SRC_DIR}/main.cpp" "${SRC_DIR}/Store.cpp" "${SRC_DIR}/glad.c")
+set(SOURCES 
+  "${SRC_DIR}/main.cpp" 
+  "${SRC_DIR}/Store.cpp" 
+  "${SRC_DIR}/glad.c"
+  "${SRC_DIR}/game.cpp"
+  )
 
 add_executable(${PROJECT_NAME} ${SOURCES})
 

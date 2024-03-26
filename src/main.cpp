@@ -1,8 +1,12 @@
 #include "../include/glad/glad.h"
+#include "game.h"
 #include <GL/gl.h>
 #include <GLFW/glfw3.h>
 #include <cstdlib>
-#include <iostream>
+
+
+int WINDOW_WIDTH = 1600;
+int WINDOW_HEIGHT = 900;
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
   glViewport(0, 0, width, height);
@@ -20,11 +24,15 @@ int main(int argc, char **argv) {
   if (!glfwInit())
     return EXIT_FAILURE;
 
+  // for glfw to know more about the context and adjust its functionality
+  // accordingly
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+  // access to a smaller subset of OpenGL features without backwards-compatible
+  // features
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-  window = glfwCreateWindow(640, 480, "Hello World", NULL, NULL);
+  window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Hello World", NULL, NULL);
 
   if (!window) {
     glfwTerminate();
@@ -33,12 +41,13 @@ int main(int argc, char **argv) {
 
   glfwMakeContextCurrent(window);
 
+  // init GLAD to manage function pointers to OpenGL
   if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-    std::cerr << "Failed to initialize GLAD" << std::endl;
-    return -1;
+    glfwTerminate();
+    return EXIT_FAILURE;
   }
 
-  glViewport(0, 0, 640, 480);
+  glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 
   glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
@@ -47,8 +56,10 @@ int main(int argc, char **argv) {
 
     processInput(window);
 
-    glfwSwapBuffers(window);
+    // rendering
+    playGame();
 
+    glfwSwapBuffers(window);
     glfwPollEvents();
   }
 
