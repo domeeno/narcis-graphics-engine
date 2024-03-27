@@ -1,6 +1,8 @@
 #ifndef GAME_H
 #define GAME_H
 
-void playGame();
+#include <GLFW/glfw3.h>
+
+void playGame(GLFWwindow *window);
 
 #endif // GAME_H
