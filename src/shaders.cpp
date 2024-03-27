@@ -4,19 +4,30 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 
-const char *vertexShaderSource =
-    "#version 330 core\n"
-    "layout (location = 0) in vec3 aPos;\n"
-    "void main() {\n"
-    "  gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-    "}\0";
+const char *vertexShaderSource = R"glsl(
+  #version 330 core
+  layout (location = 0) in vec3 aPos;
 
-const char *fragmentShaderSource =
-    "#version 330 core\n"
-    "out vec4 FragColor;\n"
-    "void main() {\n"
-    " FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
-    "}\0";
+  void main() {
+    gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);
+  }
+)glsl";
+
+const char *fragmentShaderOrange = R"glsl(
+  #version 330 core
+  out vec4 FragColor;
+  void main() {
+    FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);
+  }
+)glsl";
+
+const char *fragmentShaderGreen = R"glsl(
+  #version 330 core
+  out vec4 FragColor;
+  void main() {
+    FragColor = vec4(0.5f, 1.0f, 0.2f, 1.0f);
+  }
+)glsl";
 
 static void verify_shader_compile(unsigned int &shaderId);
 static void verify_program_compile(unsigned int &shaderId);
@@ -48,7 +59,25 @@ unsigned int init_fragment_shader() {
             << std::endl;
 
   // linking shader id to the address of vertexShaderSource
-  glShaderSource(fragmentShaderId, 1, &fragmentShaderSource, NULL);
+  glShaderSource(fragmentShaderId, 1, &fragmentShaderOrange, NULL);
+  glCompileShader(fragmentShaderId);
+
+  verify_shader_compile(fragmentShaderId);
+
+  return fragmentShaderId;
+}
+
+unsigned int init_fragment_green() {
+  unsigned int fragmentShaderId;
+
+  // GL_VERTEX_SHADER specifies type of shader
+  fragmentShaderId = glCreateShader(GL_FRAGMENT_SHADER);
+
+  std::cout << "::assgined fragment shader id: " << fragmentShaderId
+            << std::endl;
+
+  // linking shader id to the address of vertexShaderSource
+  glShaderSource(fragmentShaderId, 1, &fragmentShaderGreen, NULL);
   glCompileShader(fragmentShaderId);
 
   verify_shader_compile(fragmentShaderId);
@@ -57,7 +86,7 @@ unsigned int init_fragment_shader() {
 }
 
 unsigned int init_shader_program(unsigned int vertexShaderId,
-                         unsigned int fragmentShaderId) {
+                                 unsigned int fragmentShaderId) {
   unsigned int shaderProgramId;
   shaderProgramId = glCreateProgram();
 
@@ -68,8 +97,11 @@ unsigned int init_shader_program(unsigned int vertexShaderId,
   verify_program_compile(shaderProgramId);
 
   glUseProgram(shaderProgramId);
-  glDeleteShader(vertexShaderId);
-  glDeleteShader(vertexShaderId);
+
+  glDeleteShader(fragmentShaderId);
+
+  std::cout << "::deleted fragment shader id: " << fragmentShaderId
+            << std::endl;
 
   return shaderProgramId;
 }

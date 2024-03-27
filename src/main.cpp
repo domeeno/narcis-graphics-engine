@@ -5,8 +5,6 @@
 
 #include <GL/gl.h>
 #include <GLFW/glfw3.h>
-#include <chrono>
-#include <thread>
 
 int WINDOW_WIDTH = 1600;
 int WINDOW_HEIGHT = 900;
@@ -17,32 +15,36 @@ int main(int argc, char **argv) {
   GLFWwindow *window = initGlfwWindow(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_NAME,
                                       3, 3, GLFW_OPENGL_CORE_PROFILE);
 
-  unsigned int shaderProgram = init_shader_program(
-      init_vertex_shader(),  // return vertex shader program id
+  int vertexShaderId = init_vertex_shader();
+
+  unsigned int shaderProgramOrange = init_shader_program(
+      vertexShaderId,
       init_fragment_shader() // return fragment shader program id
   );
 
-  float vertexArr[3][9] = {{
-                               -0.4f, -0.2f, 0.0f, // bottom left
-                               -0.2f, -0.2f, 0.0f, // bottom right
-                               -0.3f, 0.15f, 0.0f, // top
-                           },
-                           {
-                               -0.1f, -0.2f, 0.0f, // bottom left
-                               0.1f, -0.2f, 0.0f,  // bottom right
-                               0.0f, 0.15f, 0.0f,  // top
-                           },
-                           {
-                               0.2f, -0.2f, 0.0f, // bottom left
-                               0.4f, -0.2f, 0.0f, // bottom right
-                               0.3f, 0.15f, 0.0f  // top
-                           }};
+  unsigned int shaderProgramGreen = init_shader_program(
+      vertexShaderId,
+      init_fragment_green() // return fragment shader program id
+  );
 
-  float triangleRightVertices[] = {
-      0.2f, -0.2f, 0.0f, // bottom left
-      0.4f, -0.2f, 0.0f, // bottom right
-      0.3f, 0.15f, 0.0f  // top
-  };
+  glDeleteShader(vertexShaderId);
+
+  float vertexArr[3][9] = //
+      {{
+           -0.4f, -0.2f, 0.0f, // bottom left
+           -0.2f, -0.2f, 0.0f, // bottom right
+           -0.3f, 0.15f, 0.0f, // top
+       },
+       {
+           -0.1f, -0.2f, 0.0f, // bottom left
+           0.1f, -0.2f, 0.0f,  // bottom right
+           0.0f, 0.15f, 0.0f,  // top
+       },
+       {
+           0.2f, -0.2f, 0.0f, // bottom left
+           0.4f, -0.2f, 0.0f, // bottom right
+           0.3f, 0.15f, 0.0f  // top
+       }};
 
   // create a memory on the gpu where vertex data will be stored
   unsigned int vbos[3], vaos[3];
@@ -51,10 +53,10 @@ int main(int argc, char **argv) {
 
   for (int i = 0; i < 3; i++) {
     // vertex buffer array object binding
+    glBindVertexArray(vaos[i]);
     glBindBuffer(GL_ARRAY_BUFFER, vbos[i]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertexArr[i]), vertexArr[i],
                  GL_STATIC_DRAW);
-    glBindVertexArray(vaos[i]);
 
     // Core OpenGL requires that a VAO should be used, to know what to do with
     // vertex inputs from VBO
@@ -64,10 +66,12 @@ int main(int argc, char **argv) {
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float),
                           (void *)0);
     glEnableVertexAttribArray(0);
-  }
 
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
-  glBindVertexArray(0);
+    // unbind reset, good practice, so no accidents or setup performed
+    // uninentionally on a different buffer
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
+  }
 
   // wireframe mode
   glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -77,12 +81,15 @@ int main(int argc, char **argv) {
 
     playGame(window);
 
-    glUseProgram(shaderProgram);
+    glUseProgram(shaderProgramOrange);
 
-    for (GLuint vao : vaos) {
-      glBindVertexArray(vao);
-      glDrawArrays(GL_TRIANGLES, 0, 3);
-    }
+    glBindVertexArray(vaos[0]);
+    glDrawArrays(GL_TRIANGLES, 0, 3);
+
+    glUseProgram(shaderProgramGreen);
+
+    glBindVertexArray(vaos[2]);
+    glDrawArrays(GL_TRIANGLES, 0, 3);
 
     glfwSwapBuffers(window);
     glfwPollEvents();
@@ -91,7 +98,8 @@ int main(int argc, char **argv) {
   glDeleteVertexArrays(2, vaos);
   glDeleteBuffers(2, vbos);
 
-  glDeleteProgram(shaderProgram);
+  glDeleteProgram(shaderProgramOrange);
+  glDeleteProgram(shaderProgramGreen);
 
   glfwTerminate();
 
