@@ -5,6 +5,8 @@
 
 #include <GL/gl.h>
 #include <GLFW/glfw3.h>
+#include <chrono>
+#include <thread>
 
 int WINDOW_WIDTH = 1600;
 int WINDOW_HEIGHT = 900;
@@ -20,16 +22,21 @@ int main(int argc, char **argv) {
       init_fragment_shader() // return fragment shader program id
   );
 
-  float vertices[] = {
-      -0.1f, -0.2f, 0.0f, // bottom left
-      0.1f,  -0.2f, 0.0f, // bottom right
-      0.0f,  0.15f, 0.0f, // top
-
-      -0.4f, -0.2f, 0.0f, // bottom left
-      -0.2f, -0.2f, 0.0f, // bottom right
-      -0.3f, 0.15f, 0.0f, // top
-
-  };
+  float vertexArr[3][9] = {{
+                               -0.4f, -0.2f, 0.0f, // bottom left
+                               -0.2f, -0.2f, 0.0f, // bottom right
+                               -0.3f, 0.15f, 0.0f, // top
+                           },
+                           {
+                               -0.1f, -0.2f, 0.0f, // bottom left
+                               0.1f, -0.2f, 0.0f,  // bottom right
+                               0.0f, 0.15f, 0.0f,  // top
+                           },
+                           {
+                               0.2f, -0.2f, 0.0f, // bottom left
+                               0.4f, -0.2f, 0.0f, // bottom right
+                               0.3f, 0.15f, 0.0f  // top
+                           }};
 
   float triangleRightVertices[] = {
       0.2f, -0.2f, 0.0f, // bottom left
@@ -38,27 +45,27 @@ int main(int argc, char **argv) {
   };
 
   // create a memory on the gpu where vertex data will be stored
-  unsigned int VBO;
-  glGenBuffers(1, &VBO);
+  unsigned int vbos[3], vaos[3];
+  glGenBuffers(3, vbos);
+  glGenVertexArrays(3, vaos);
 
-  // vertex buffer array object binding
-  glBindBuffer(GL_ARRAY_BUFFER, VBO);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+  for (int i = 0; i < 3; i++) {
+    // vertex buffer array object binding
+    glBindBuffer(GL_ARRAY_BUFFER, vbos[i]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertexArr[i]), vertexArr[i],
+                 GL_STATIC_DRAW);
+    glBindVertexArray(vaos[i]);
 
-  // Core OpenGL requires that a VAO should be used, to know what to do with
-  // vertex inputs from VBO
-  unsigned int VAO;
-  // vertex array object binding
-  glGenVertexArrays(1, &VAO);
-  glBindVertexArray(VAO);
+    // Core OpenGL requires that a VAO should be used, to know what to do with
+    // vertex inputs from VBO
+    // tell GL to interpret vertex data as
+    // |       vertex 1     ||       vertex2      ||      vertex3       |
+    // |xfloat|yfloat|zfloat||xfloat|yfloat|zfloat||xfloat|yfloat|zfloat|
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float),
+                          (void *)0);
+    glEnableVertexAttribArray(0);
+  }
 
-  // tell GL to interpret vertex data as
-  // |       vertex 1     ||       vertex2      ||      vertex3       |
-  // |xfloat|yfloat|zfloat||xfloat|yfloat|zfloat||xfloat|yfloat|zfloat|
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
-  glEnableVertexAttribArray(0);
-
-  // unbind
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   glBindVertexArray(0);
 
@@ -71,15 +78,18 @@ int main(int argc, char **argv) {
     playGame(window);
 
     glUseProgram(shaderProgram);
-    glBindVertexArray(VAO);
-    glDrawArrays(GL_TRIANGLES, 0, 9);
+
+    for (GLuint vao : vaos) {
+      glBindVertexArray(vao);
+      glDrawArrays(GL_TRIANGLES, 0, 3);
+    }
 
     glfwSwapBuffers(window);
     glfwPollEvents();
   }
 
-  glDeleteVertexArrays(1, &VAO);
-  glDeleteBuffers(1, &VBO);
+  glDeleteVertexArrays(2, vaos);
+  glDeleteBuffers(2, vbos);
 
   glDeleteProgram(shaderProgram);
 
