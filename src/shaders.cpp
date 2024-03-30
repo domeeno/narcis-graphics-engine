@@ -7,9 +7,13 @@
 const char *defaultVertexShaderSource = R"glsl(
   #version 330 core
   layout (location = 0) in vec3 aPos;
+  layout (location = 1) in vec3 aColor;
+
+  out vec3 ourColor;
 
   void main() {
-    gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);
+    gl_Position = vec4(aPos, 1.0);
+    ourColor = aColor;
   }
 )glsl";
 
@@ -18,9 +22,10 @@ const char *defaultVertexShaderSource = R"glsl(
 const char *fragmentShaderBlue = R"glsl(
   #version 330 core
   out vec4 FragColor;
-  uniform vec4 sinColor;
+  in vec3 ourColor;
+
   void main() {
-    FragColor = sinColor;
+    FragColor = vec4(ourColor, 1.0f);
   }
 )glsl";
 
@@ -78,24 +83,6 @@ unsigned int init_fragment_shader() {
 
   // linking shader id to the address of vertexShaderSource
   glShaderSource(fragmentShaderId, 1, &fragmentShaderBlue, NULL);
-  glCompileShader(fragmentShaderId);
-
-  verify_shader_compile(fragmentShaderId);
-
-  return fragmentShaderId;
-}
-
-unsigned int init_fragment_green() {
-  unsigned int fragmentShaderId;
-
-  // GL_VERTEX_SHADER specifies type of shader
-  fragmentShaderId = glCreateShader(GL_FRAGMENT_SHADER);
-
-  std::cout << "::assgined fragment shader id: " << fragmentShaderId
-            << std::endl;
-
-  // linking shader id to the address of vertexShaderSource
-  glShaderSource(fragmentShaderId, 1, &fragmentShaderGreen, NULL);
   glCompileShader(fragmentShaderId);
 
   verify_shader_compile(fragmentShaderId);

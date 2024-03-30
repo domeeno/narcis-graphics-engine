@@ -13,12 +13,6 @@ void processInput(GLFWwindow *window) {
   }
 }
 
-float vertices[] = {
-    -0.5f, -0.5f, 0.0f, //
-    0.5f,  -0.5f, 0.0f, //
-    0.0f,  0.5f,  0.0f  //
-};
-
 void playGame(GLFWwindow *window) {
   processInput(window);
   glClearColor(0.2f, 0.2f, 0.2f, 1);
