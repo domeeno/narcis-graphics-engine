@@ -4,12 +4,23 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 
-const char *vertexShaderSource = R"glsl(
+const char *defaultVertexShaderSource = R"glsl(
   #version 330 core
   layout (location = 0) in vec3 aPos;
 
   void main() {
     gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);
+  }
+)glsl";
+
+// I like this color vec4(0.2f, 0.5f, 1.0f, 1.0f);
+
+const char *fragmentShaderBlue = R"glsl(
+  #version 330 core
+  out vec4 FragColor;
+  uniform vec4 sinColor;
+  void main() {
+    FragColor = sinColor;
   }
 )glsl";
 
@@ -33,6 +44,13 @@ static void verify_shader_compile(unsigned int &shaderId);
 static void verify_program_compile(unsigned int &shaderId);
 
 unsigned int init_vertex_shader() {
+
+  int nrAttributes;
+  glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &nrAttributes);
+
+  std::cout << "::maximum nr of vertex attributes supported: " << nrAttributes
+            << std::endl;
+
   unsigned int vertexShaderId;
 
   // GL_VERTEX_SHADER specifies type of shader
@@ -41,7 +59,7 @@ unsigned int init_vertex_shader() {
   std::cout << "::assgined vertex shader id: " << vertexShaderId << std::endl;
 
   // linking shader id to the address of vertexShaderSource
-  glShaderSource(vertexShaderId, 1, &vertexShaderSource, NULL);
+  glShaderSource(vertexShaderId, 1, &defaultVertexShaderSource, NULL);
   glCompileShader(vertexShaderId);
 
   verify_shader_compile(vertexShaderId);
@@ -59,7 +77,7 @@ unsigned int init_fragment_shader() {
             << std::endl;
 
   // linking shader id to the address of vertexShaderSource
-  glShaderSource(fragmentShaderId, 1, &fragmentShaderOrange, NULL);
+  glShaderSource(fragmentShaderId, 1, &fragmentShaderBlue, NULL);
   glCompileShader(fragmentShaderId);
 
   verify_shader_compile(fragmentShaderId);

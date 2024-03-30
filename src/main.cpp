@@ -5,6 +5,7 @@
 
 #include <GL/gl.h>
 #include <GLFW/glfw3.h>
+#include <cmath>
 
 int WINDOW_WIDTH = 1600;
 int WINDOW_HEIGHT = 900;
@@ -17,7 +18,7 @@ int main(int argc, char **argv) {
 
   int vertexShaderId = init_vertex_shader();
 
-  unsigned int shaderProgramOrange = init_shader_program(
+  unsigned int shaderProgramBlue = init_shader_program(
       vertexShaderId,
       init_fragment_shader() // return fragment shader program id
   );
@@ -74,14 +75,21 @@ int main(int argc, char **argv) {
   }
 
   // wireframe mode
-  glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+  // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
   while (!glfwWindowShouldClose(window)) {
     glClear(GL_COLOR_BUFFER_BIT);
 
     playGame(window);
 
-    glUseProgram(shaderProgramOrange);
+    float timeValue = glfwGetTime();
+    float blueValue = (sin(timeValue) / 2.0f) + 0.5f;
+
+    int vertexColorLocation =
+        glGetUniformLocation(shaderProgramBlue, "sinColor");
+    glUseProgram(shaderProgramBlue);
+
+    glUniform4f(vertexColorLocation, 0.2f, 0.5f, blueValue, 1.0f);
 
     glBindVertexArray(vaos[0]);
     glDrawArrays(GL_TRIANGLES, 0, 3);
@@ -98,7 +106,7 @@ int main(int argc, char **argv) {
   glDeleteVertexArrays(2, vaos);
   glDeleteBuffers(2, vbos);
 
-  glDeleteProgram(shaderProgramOrange);
+  glDeleteProgram(shaderProgramBlue);
   glDeleteProgram(shaderProgramGreen);
 
   glfwTerminate();
