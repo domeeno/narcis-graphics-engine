@@ -15,14 +15,7 @@ int main(int argc, char **argv) {
   GLFWwindow *window = initGlfwWindow(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_NAME,
                                       3, 3, GLFW_OPENGL_CORE_PROFILE);
 
-  int vertexShaderId = init_vertex_shader();
-
-  unsigned int shaderProgramGreen = init_shader_program(
-      vertexShaderId,
-      init_fragment_shader() // return fragment shader program id
-  );
-
-  glDeleteShader(vertexShaderId);
+  Shader *shader = new Shader("src/gl/vertex.glsl", "src/gl/fragment.glsl");
 
   float vertexArr[3][18] = //
       {{
@@ -65,13 +58,12 @@ int main(int argc, char **argv) {
 
   // wireframe mode
   // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
   while (!glfwWindowShouldClose(window)) {
     glClear(GL_COLOR_BUFFER_BIT);
 
     playGame(window);
 
-    glUseProgram(shaderProgramGreen);
+    shader->use();
 
     glBindVertexArray(vaos[0]);
     glDrawArrays(GL_TRIANGLES, 0, 3);
@@ -80,10 +72,10 @@ int main(int argc, char **argv) {
     glfwPollEvents();
   }
 
-  glDeleteVertexArrays(2, vaos);
-  glDeleteBuffers(2, vbos);
+  delete shader;
 
-  glDeleteProgram(shaderProgramGreen);
+  glDeleteVertexArrays(BUFFERS, vaos);
+  glDeleteBuffers(BUFFERS, vbos);
 
   glfwTerminate();
 

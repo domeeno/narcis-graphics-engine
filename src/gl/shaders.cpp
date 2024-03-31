@@ -1,61 +1,61 @@
 #include "shaders.h"
-#include "../include/glad/glad.h"
-#include <GL/gl.h>
-#include <GLFW/glfw3.h>
 #include <iostream>
+#include <ostream>
 
-const char *defaultVertexShaderSource = R"glsl(
-  #version 330 core
-  layout (location = 0) in vec3 aPos;
-  layout (location = 1) in vec3 aColor;
+void verify_shader_compile(unsigned int &shaderId);
+void verify_program_compile(unsigned int &shaderId);
 
-  out vec3 ourColor;
+Shader::Shader(const char *vertexPath, const char *fragmentPath) {
+  std::string vertexCode = readShaderFileIntoCString(vertexPath);
+  std::string fragmentCode = readShaderFileIntoCString(fragmentPath);
 
-  void main() {
-    gl_Position = vec4(aPos, 1.0);
-    ourColor = aColor;
+  unsigned int vertexShader = init_shader(vertexCode.c_str());
+  unsigned int fragmentShader = init_shader(fragmentCode.c_str());
+
+  init_program(vertexShader, fragmentShader);
+}
+
+void Shader::setBool(const std::string &name, bool value) const {
+  glUniform1i(glGetUniformLocation(id, name.c_str()), (int)value);
+}
+void Shader::setInt(const std::string &name, int value) const {
+  glUniform1i(glGetUniformLocation(id, name.c_str()), value);
+}
+void Shader::setFloat(const std::string &name, float value) const {
+  glUniform1f(glGetUniformLocation(id, name.c_str()), value);
+}
+
+Shader::~Shader() {
+  std::cout << "::deleted prog shader id: " << id << std::endl;
+  glDeleteProgram(id);
+}
+
+std::string Shader::readShaderFileIntoCString(const char *filePath) {
+  std::string shaderCodeStr;
+
+  std::ifstream shaderFile;
+
+  shaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+
+  try {
+    shaderFile.open(filePath);
+
+    std::stringstream shaderFStream;
+
+    shaderFStream << shaderFile.rdbuf();
+
+    shaderFile.close();
+
+    shaderCodeStr = shaderFStream.str();
+
+  } catch (std::ifstream::failure e) {
+    std::cerr << "ERROR::SHDR::FILE_NOT_FOUND: " << filePath << std::endl;
   }
-)glsl";
 
-// I like this color vec4(0.2f, 0.5f, 1.0f, 1.0f);
+  return shaderCodeStr;
+}
 
-const char *fragmentShaderBlue = R"glsl(
-  #version 330 core
-  out vec4 FragColor;
-  in vec3 ourColor;
-
-  void main() {
-    FragColor = vec4(ourColor, 1.0f);
-  }
-)glsl";
-
-const char *fragmentShaderOrange = R"glsl(
-  #version 330 core
-  out vec4 FragColor;
-  void main() {
-    FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);
-  }
-)glsl";
-
-const char *fragmentShaderGreen = R"glsl(
-  #version 330 core
-  out vec4 FragColor;
-  void main() {
-    FragColor = vec4(0.5f, 1.0f, 0.2f, 1.0f);
-  }
-)glsl";
-
-static void verify_shader_compile(unsigned int &shaderId);
-static void verify_program_compile(unsigned int &shaderId);
-
-unsigned int init_vertex_shader() {
-
-  int nrAttributes;
-  glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &nrAttributes);
-
-  std::cout << "::maximum nr of vertex attributes supported: " << nrAttributes
-            << std::endl;
-
+unsigned int Shader::init_shader(const char *source) {
   unsigned int vertexShaderId;
 
   // GL_VERTEX_SHADER specifies type of shader
@@ -64,7 +64,7 @@ unsigned int init_vertex_shader() {
   std::cout << "::assgined vertex shader id: " << vertexShaderId << std::endl;
 
   // linking shader id to the address of vertexShaderSource
-  glShaderSource(vertexShaderId, 1, &defaultVertexShaderSource, NULL);
+  glShaderSource(vertexShaderId, 1, &source, NULL);
   glCompileShader(vertexShaderId);
 
   verify_shader_compile(vertexShaderId);
@@ -72,46 +72,39 @@ unsigned int init_vertex_shader() {
   return vertexShaderId;
 }
 
-unsigned int init_fragment_shader() {
-  unsigned int fragmentShaderId;
+void Shader::init_program(unsigned int vertexShaderId,
+                          unsigned int fragShaderId) {
+  int nrAttributes;
+  glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &nrAttributes);
 
-  // GL_VERTEX_SHADER specifies type of shader
-  fragmentShaderId = glCreateShader(GL_FRAGMENT_SHADER);
-
-  std::cout << "::assgined fragment shader id: " << fragmentShaderId
+  std::cout << "::maximum nr of vertex attributes supported: " << nrAttributes
             << std::endl;
 
-  // linking shader id to the address of vertexShaderSource
-  glShaderSource(fragmentShaderId, 1, &fragmentShaderBlue, NULL);
-  glCompileShader(fragmentShaderId);
+  id = glCreateProgram();
 
-  verify_shader_compile(fragmentShaderId);
+  glAttachShader(id, vertexShaderId);
+  glAttachShader(id, fragShaderId);
+  glLinkProgram(id);
 
-  return fragmentShaderId;
+  verify_program_compile(id);
+
+  glUseProgram(id);
+
+  glDeleteShader(fragShaderId);
+  glDeleteShader(vertexShaderId);
+
+  std::cout << "::deleted vert shader id: " << vertexShaderId << std::endl;
+  std::cout << "::deleted frag shader id: " << fragShaderId << std::endl;
 }
 
-unsigned int init_shader_program(unsigned int vertexShaderId,
-                                 unsigned int fragmentShaderId) {
-  unsigned int shaderProgramId;
-  shaderProgramId = glCreateProgram();
+void Shader::use() { glUseProgram(id); }
 
-  glAttachShader(shaderProgramId, vertexShaderId);
-  glAttachShader(shaderProgramId, fragmentShaderId);
-  glLinkProgram(shaderProgramId);
+// I like these colors
+// vec4(0.2f, 0.5f, 1.0f, 1.0f);
+// vec4(1.0f, 0.5f, 0.2f, 1.0f);
+// vec4(0.5f, 1.0f, 0.2f, 1.0f);
 
-  verify_program_compile(shaderProgramId);
-
-  glUseProgram(shaderProgramId);
-
-  glDeleteShader(fragmentShaderId);
-
-  std::cout << "::deleted fragment shader id: " << fragmentShaderId
-            << std::endl;
-
-  return shaderProgramId;
-}
-
-static void verify_shader_compile(unsigned int &shaderId) {
+void verify_shader_compile(unsigned int &shaderId) {
   int success;
   char infoLog[512];
   glGetShaderiv(shaderId, GL_COMPILE_STATUS, &success);
@@ -119,11 +112,13 @@ static void verify_shader_compile(unsigned int &shaderId) {
   if (!success) {
     glGetShaderInfoLog(shaderId, 512, NULL, infoLog);
 
-    std::cout << "ERROR::SHADER::COMPILATION_FAILED: " << infoLog << std::endl;
+    std::cout << "ERRO::SHDR::COMPILATION_FAILED: " << infoLog << std::endl;
+  } else {
+    std::cout << "INFO::SHDR::COMPILATION_SUCCES: " << shaderId << std::endl;
   }
 }
 
-static void verify_program_compile(unsigned int &shaderId) {
+void verify_program_compile(unsigned int &shaderId) {
   int success;
   char infoLog[512];
   glGetProgramiv(shaderId, GL_COMPILE_STATUS, &success);
@@ -131,6 +126,8 @@ static void verify_program_compile(unsigned int &shaderId) {
   if (!success) {
     glGetProgramInfoLog(shaderId, 512, NULL, infoLog);
 
-    std::cout << "ERROR::PROGRAM::COMPILATION_FAILED: " << infoLog << std::endl;
+    std::cout << "ERRO::PROG::COMPILATION_FAILED: " << infoLog << std::endl;
+  } else {
+    std::cout << "INFO::PROG::COMPILATION_SUCCES: " << shaderId << std::endl;
   }
 }
