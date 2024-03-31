@@ -30,6 +30,10 @@ void Shader::setInt(const std::string &name, int value) const {
 void Shader::setFloat(const std::string &name, float value) const {
   glUniform1f(glGetUniformLocation(id, name.c_str()), value);
 }
+void Shader::setFloat3f(const std::string &name, float x, float y, float z) const {
+  glUniform3f(glGetUniformLocation(id, name.c_str()), x, y, z);
+}
+
 
 Shader::~Shader() {
   std::cout << "::deleted prog shader id: " << id << std::endl;

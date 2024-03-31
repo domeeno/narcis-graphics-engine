@@ -56,12 +56,16 @@ int main(int argc, char **argv) {
     glBindVertexArray(0);
   }
 
+  float offset = 0.4f;
+
   // wireframe mode
   // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
   while (!glfwWindowShouldClose(window)) {
     playGame(window);
 
     shader->use();
+
+    shader->setFloat3f("offset", offset, offset, offset);
 
     glBindVertexArray(vaos[0]);
     glDrawArrays(GL_TRIANGLES, 0, 3);
