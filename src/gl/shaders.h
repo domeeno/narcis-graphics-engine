@@ -8,7 +8,6 @@
 #include <string>
 
 class Shader {
-private:
 public:
   unsigned int id;
 
@@ -21,10 +20,10 @@ public:
   void setInt(const std::string &name, int value) const;
   void setFloat(const std::string &name, float value) const;
 
-  // TODO make private somehow
-  std::string readShaderFileIntoCString(const char *filePath);
-  unsigned int init_shader(const char *source);
-  void init_program(unsigned int vertexShaderId, unsigned int fragmentShaderId);
+  std::string readShaderFileIntoCString(const char *path);
+  GLuint init_shader(const char *source, GLuint type);
+  void init_program(GLuint vertexShaderId, GLuint fragmentShaderId);
+  void verify_shader_compile(GLuint &shaderId);
+  void verify_program_compile(GLuint &shaderId);
 };
-
-#endif // SHADERS_H
+#endif

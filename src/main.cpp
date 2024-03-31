@@ -15,7 +15,7 @@ int main(int argc, char **argv) {
   GLFWwindow *window = initGlfwWindow(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_NAME,
                                       3, 3, GLFW_OPENGL_CORE_PROFILE);
 
-  Shader *shader = new Shader("src/gl/vertex.glsl", "src/gl/fragment.glsl");
+  auto *shader = new Shader("src/gl/vertex.glsl", "src/gl/fragment.glsl");
 
   float vertexArr[3][18] = //
       {{
@@ -59,8 +59,6 @@ int main(int argc, char **argv) {
   // wireframe mode
   // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
   while (!glfwWindowShouldClose(window)) {
-    glClear(GL_COLOR_BUFFER_BIT);
-
     playGame(window);
 
     shader->use();
@@ -68,6 +66,8 @@ int main(int argc, char **argv) {
     glBindVertexArray(vaos[0]);
     glDrawArrays(GL_TRIANGLES, 0, 3);
 
+    // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved
+    // etc.)
     glfwSwapBuffers(window);
     glfwPollEvents();
   }

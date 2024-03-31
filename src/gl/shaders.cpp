@@ -6,13 +6,19 @@ void verify_shader_compile(unsigned int &shaderId);
 void verify_program_compile(unsigned int &shaderId);
 
 Shader::Shader(const char *vertexPath, const char *fragmentPath) {
+  GLuint vertex, fragment;
+
+  // vertex shader
   std::string vertexCode = readShaderFileIntoCString(vertexPath);
+  const char *vShaderCode = vertexCode.c_str();
+  vertex = init_shader(vShaderCode, GL_VERTEX_SHADER);
+
+  // fragment shader
   std::string fragmentCode = readShaderFileIntoCString(fragmentPath);
+  const char *fShaderCode = fragmentCode.c_str();
+  fragment = init_shader(fShaderCode, GL_FRAGMENT_SHADER);
 
-  unsigned int vertexShader = init_shader(vertexCode.c_str());
-  unsigned int fragmentShader = init_shader(fragmentCode.c_str());
-
-  init_program(vertexShader, fragmentShader);
+  init_program(vertex, fragment);
 }
 
 void Shader::setBool(const std::string &name, bool value) const {
@@ -31,6 +37,7 @@ Shader::~Shader() {
 }
 
 std::string Shader::readShaderFileIntoCString(const char *filePath) {
+  std::cout << "::loading shader path: " << filePath << std::endl;
   std::string shaderCodeStr;
 
   std::ifstream shaderFile;
@@ -55,21 +62,13 @@ std::string Shader::readShaderFileIntoCString(const char *filePath) {
   return shaderCodeStr;
 }
 
-unsigned int Shader::init_shader(const char *source) {
-  unsigned int vertexShaderId;
-
-  // GL_VERTEX_SHADER specifies type of shader
-  vertexShaderId = glCreateShader(GL_VERTEX_SHADER);
-
-  std::cout << "::assgined vertex shader id: " << vertexShaderId << std::endl;
-
-  // linking shader id to the address of vertexShaderSource
-  glShaderSource(vertexShaderId, 1, &source, NULL);
-  glCompileShader(vertexShaderId);
-
-  verify_shader_compile(vertexShaderId);
-
-  return vertexShaderId;
+GLuint Shader::init_shader(const char *source, GLuint type) {
+  unsigned int shaderId;
+  shaderId = glCreateShader(type);
+  glShaderSource(shaderId, 1, &source, NULL);
+  glCompileShader(shaderId);
+  verify_shader_compile(shaderId);
+  return shaderId;
 }
 
 void Shader::init_program(unsigned int vertexShaderId,
@@ -82,18 +81,22 @@ void Shader::init_program(unsigned int vertexShaderId,
 
   id = glCreateProgram();
 
+  std::cout << "::attach vert shader: " << vertexShaderId << " to program "
+            << id << std::endl;
   glAttachShader(id, vertexShaderId);
+
+  std::cout << "::attach frag shader: " << fragShaderId << " to program " << id
+            << std::endl;
   glAttachShader(id, fragShaderId);
+
   glLinkProgram(id);
-
   verify_program_compile(id);
-
   glUseProgram(id);
 
-  glDeleteShader(fragShaderId);
   glDeleteShader(vertexShaderId);
-
   std::cout << "::deleted vert shader id: " << vertexShaderId << std::endl;
+
+  glDeleteShader(fragShaderId);
   std::cout << "::deleted frag shader id: " << fragShaderId << std::endl;
 }
 
@@ -104,7 +107,7 @@ void Shader::use() { glUseProgram(id); }
 // vec4(1.0f, 0.5f, 0.2f, 1.0f);
 // vec4(0.5f, 1.0f, 0.2f, 1.0f);
 
-void verify_shader_compile(unsigned int &shaderId) {
+void Shader::verify_shader_compile(unsigned int &shaderId) {
   int success;
   char infoLog[512];
   glGetShaderiv(shaderId, GL_COMPILE_STATUS, &success);
@@ -118,7 +121,7 @@ void verify_shader_compile(unsigned int &shaderId) {
   }
 }
 
-void verify_program_compile(unsigned int &shaderId) {
+void Shader::verify_program_compile(unsigned int &shaderId) {
   int success;
   char infoLog[512];
   glGetProgramiv(shaderId, GL_COMPILE_STATUS, &success);
