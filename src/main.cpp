@@ -61,11 +61,12 @@ int main(int argc, char **argv) {
   // wireframe mode
   // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
   while (!glfwWindowShouldClose(window)) {
-    playGame(window);
+    glClearColor(0.2f, 0.2f, 0.2f, 1);
+    glClear(GL_COLOR_BUFFER_BIT);
 
     shader->use();
 
-    shader->setFloat3f("offset", offset, offset, offset);
+    playGame(window, shader);
 
     glBindVertexArray(vaos[0]);
     glDrawArrays(GL_TRIANGLES, 0, 3);
