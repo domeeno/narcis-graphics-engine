@@ -1,11 +1,10 @@
 #include "../include/glad/glad.h"
-#include "cglfw.h"
-#include "game.h"
-#include "shaders.h"
+#include "./game/game.h"
+#include "./gl/shaders.h"
+#include "./window/cglfw.h"
 
 #include <GL/gl.h>
 #include <GLFW/glfw3.h>
-#include <cmath>
 
 int WINDOW_WIDTH = 1600;
 int WINDOW_HEIGHT = 900;

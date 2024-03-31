@@ -5,11 +5,10 @@ project(WallachiaStore)
 set(SRC_DIR "${CMAKE_CURRENT_LIST_DIR}/src")
 set(SOURCES 
   "${SRC_DIR}/main.cpp" 
-  "${SRC_DIR}/Store.cpp" 
-  "${SRC_DIR}/glad.c"
-  "${SRC_DIR}/shaders.cpp"
-  "${SRC_DIR}/cglfw.cpp"
-  "${SRC_DIR}/game.cpp"
+  "${SRC_DIR}/gl/glad.c"
+  "${SRC_DIR}/gl/shaders.cpp"
+  "${SRC_DIR}/window/cglfw.cpp"
+  "${SRC_DIR}/game/game.cpp"
   )
 
 add_executable(${PROJECT_NAME} ${SOURCES})
