@@ -2,6 +2,7 @@
 #include "./game/game.h"
 #include "./gl/shaders.h"
 #include "./lib/cglfw.h"
+#include "./lib/textures.h"
 
 #include <GL/gl.h>
 #include <GLFW/glfw3.h>
@@ -24,6 +25,9 @@ int main(int argc, char **argv) {
           0.1f, -0.2f, 0.0f, 0.0f, 1.0f, 0.0f,  // bottom right
           0.0f, 0.15f, 0.0f, 0.0f, 0.0f, 1.0f,  // top
       }};
+
+  unsigned char *data = load_texture_data("static/image.png");
+  free_texture_data(data);
 
   // create a memory on the gpu where vertex data will be stored
   int BUFFERS = 1;
