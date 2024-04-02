@@ -65,6 +65,7 @@ int main(int argc, char **argv) {
     glClear(GL_COLOR_BUFFER_BIT);
 
     shader->use();
+    shader->setFloat3f("colorOffset", offset, offset, offset);
 
     playGame(window, shader);
 
