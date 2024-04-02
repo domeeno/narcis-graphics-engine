@@ -1,7 +1,7 @@
 #include "../include/glad/glad.h"
 #include "./game/game.h"
 #include "./gl/shaders.h"
-#include "./window/cglfw.h"
+#include "./lib/cglfw.h"
 
 #include <GL/gl.h>
 #include <GLFW/glfw3.h>
