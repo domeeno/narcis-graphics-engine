@@ -4,7 +4,14 @@
 #include "../../include/stb/stb_image.h"
 #include <iostream>
 
-unsigned char *load_texture_data(const char *path);
-void free_texture_data(unsigned char *data);
+
+class Texture
+{
+  public:
+    int width, height, nrOfChannels;
+    unsigned char *data;
+    Texture(const char *path);
+    ~Texture();
+};
 
 #endif // TEXTURES_H
