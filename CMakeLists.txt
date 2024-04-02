@@ -9,6 +9,7 @@ set(SOURCES
   "${SRC_DIR}/gl/shaders.cpp"
   "${SRC_DIR}/lib/cglfw.cpp"
   "${SRC_DIR}/lib/stb_image.cpp"
+  "${SRC_DIR}/lib/textures.cpp"
   "${SRC_DIR}/game/game.cpp"
   )
 
@@ -30,3 +31,6 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
   CXX_STANDARD_REQUIRED ON
   CXX_EXTENSIONS OFF
 )
+
+set(CMAKE_BUILD_TYPE "Debug")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g")
