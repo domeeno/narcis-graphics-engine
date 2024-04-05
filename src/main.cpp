@@ -16,18 +16,16 @@ int main(int argc, char **argv) {
   GLFWwindow *window = initGlfwWindow(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_NAME,
                                       3, 3, GLFW_OPENGL_CORE_PROFILE);
 
-  auto *shader = new Shader("src/gl/vertex.glsl", "src/gl/fragment.glsl");
+  auto *shader =
+      new Shader("src/shaders/texture_vs.glsl", "src/shaders/texture_fs.glsl");
 
-  float vertexArr[3][18] = //
+  float vertexArr[3][24] = //
       {{
           // positions          //color
-          -0.1f, -0.2f, 0.0f, 1.0f, 0.0f, 0.0f, // bottom left
-          0.1f, -0.2f, 0.0f, 0.0f, 1.0f, 0.0f,  // bottom right
-          0.0f, 0.15f, 0.0f, 0.0f, 0.0f, 1.0f,  // top
+          -0.1f, -0.2f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, // bottom left
+          0.1f,  -0.2f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, // bottom right
+          0.0f,  0.15f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f  // top
       }};
-
-  unsigned char *data = load_texture_data("static/image.png");
-  free_texture_data(data);
 
   // create a memory on the gpu where vertex data will be stored
   int BUFFERS = 1;
@@ -47,18 +45,51 @@ int main(int argc, char **argv) {
     // tell GL to interpret vertex data as
     // |       vertex 1     ||       vertex2      ||      vertex3       |
     // |xfloat|yfloat|zfloat||xfloat|yfloat|zfloat||xfloat|yfloat|zfloat|
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float),
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
                           (void *)0);
     glEnableVertexAttribArray(0);
 
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float),
+    // colors
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
                           (void *)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
+
+    // texture
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
+                          (void *)(6 * sizeof(float)));
+    glEnableVertexAttribArray(2);
+
     // unbind reset, good practice, so no accidents or setup performed
     // uninentionally on a different buffer
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
   }
+
+  unsigned int textureId;
+  glGenTextures(1, &textureId);
+  glBindTexture(GL_TEXTURE_2D,
+                textureId); // all upcoming GL_TEXTURE_2D operations now have
+                            // effect on this texture object
+  // set the texture wrapping parameters
+  glTexParameteri(
+      GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,
+      GL_REPEAT); // set texture wrapping to GL_REPEAT (default wrapping method)
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+  // set texture filtering parameters
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+                  GL_LINEAR_MIPMAP_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+  Texture *texture = new Texture("static/image.png");
+
+  if (texture->data != NULL) {
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texture->width, texture->height, 0,
+                 GL_RGB, GL_UNSIGNED_BYTE, texture->data);
+    glGenerateMipmap(GL_TEXTURE_2D);
+  }
+
+  delete texture;
 
   float offset = 0.4f;
 
