@@ -6,8 +6,11 @@
 
 #include <GL/gl.h>
 #include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
-int WINDOW_WIDTH = 1600;
+int WINDOW_WIDTH = 900;
 int WINDOW_HEIGHT = 900;
 const char *WINDOW_NAME = "Hello";
 
@@ -16,21 +19,20 @@ int main(int argc, char **argv) {
   GLFWwindow *window = initGlfwWindow(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_NAME,
                                       3, 3, GLFW_OPENGL_CORE_PROFILE);
 
-  auto *shader =
-      new Shader("src/shaders/texture_vs.glsl", "src/shaders/texture_fs.glsl");
+  auto *shader = new Shader("src/shaders/transform_vs.glsl",
+                            "src/shaders/texture_fs.glsl");
 
-  float vertexArr[3][32] = //
+  float vertexArr[][20] = //
       {{
-          // positions          //color
-          0.1f,  0.2f,  0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, // top right
-          0.1f,  -0.2f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, // bottom right
-          -0.1f, -0.2f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, // bottom left
-          -0.1f, 0.2f,  0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, // top left
+          0.3f,  0.3f,  0.0f, 1.0f, 1.0f, // top right
+          0.3f,  -0.3f, 0.0f, 1.0f, 0.0f, // bottom right
+          -0.3f, -0.3f, 0.0f, 0.0f, 0.0f, // bottom left
+          -0.3f, 0.3f,  0.0f, 0.0f, 1.0f  // top left
       }};
 
   unsigned int indices[] = {
-      0, 1, 3, // first triang
-      1, 2, 3, // second triang
+      0, 1, 3, // first triangle
+      1, 2, 3  // second triangle
   };
 
   // create a memory on the gpu where vertex data will be stored
@@ -56,19 +58,13 @@ int main(int argc, char **argv) {
     // tell GL to interpret vertex data as
     // |       vertex 1     ||       vertex2      ||      vertex3       |
     // |xfloat|yfloat|zfloat||xfloat|yfloat|zfloat||xfloat|yfloat|zfloat|
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float),
                           (void *)0);
     glEnableVertexAttribArray(0);
 
-    // colors
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float),
                           (void *)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
-
-    // texture
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
-                          (void *)(6 * sizeof(float)));
-    glEnableVertexAttribArray(2);
 
     // unbind reset, good practice, so no accidents or setup performed
     // uninentionally on a different buffer
@@ -110,8 +106,15 @@ int main(int argc, char **argv) {
     glClearColor(0.2f, 0.2f, 0.2f, 1);
     glClear(GL_COLOR_BUFFER_BIT);
 
+    glm::mat4 transform = glm::mat4(1.0f);
+    transform = glm::rotate(transform, (float)glfwGetTime()/2,
+                            glm::vec3(0.0f, 0.0f, 1.0f));
+
     shader->use();
     shader->setFloat3f("colorOffset", offset, offset, offset);
+
+    unsigned int location = glGetUniformLocation(shader->id, "transform");
+    glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(transform));
 
     playGame(window, shader);
     glBindVertexArray(vaos[0]);

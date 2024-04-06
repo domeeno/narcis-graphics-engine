@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.0)
 
 project(WallachiaStore)
 
+find_package(glm CONFIG REQUIRED)
+
 set(SRC_DIR "${CMAKE_CURRENT_LIST_DIR}/src")
 set(SOURCES 
   "${SRC_DIR}/main.cpp" 
@@ -24,6 +26,7 @@ target_link_libraries(${PROJECT_NAME}
   X11 
   rt 
   dl
+  glm::glm
 )
 
 set_target_properties(${PROJECT_NAME} PROPERTIES 
