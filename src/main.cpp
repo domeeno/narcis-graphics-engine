@@ -1,5 +1,4 @@
 #include "../include/glad/glad.h"
-#include "./game/game.h"
 #include "./gl/shaders.h"
 #include "./lib/cglfw.h"
 #include "./lib/textures.h"
@@ -165,7 +164,6 @@ int main(int argc, char **argv) {
     // outside the main loop only once.
     shader->setMat4("projection", projection);
 
-    playGame(window, shader);
     glBindVertexArray(vaos[0]);
     glDrawArrays(GL_TRIANGLES, 0, 36);
 

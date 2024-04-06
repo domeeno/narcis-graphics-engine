@@ -12,7 +12,6 @@ set(SOURCES
   "${SRC_DIR}/lib/cglfw.cpp"
   "${SRC_DIR}/lib/stb_image.cpp"
   "${SRC_DIR}/lib/textures.cpp"
-  "${SRC_DIR}/game/game.cpp"
   )
 
 add_executable(${PROJECT_NAME} ${SOURCES})
