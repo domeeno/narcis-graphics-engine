@@ -19,18 +19,25 @@ int main(int argc, char **argv) {
   auto *shader =
       new Shader("src/shaders/texture_vs.glsl", "src/shaders/texture_fs.glsl");
 
-  float vertexArr[3][24] = //
+  float vertexArr[3][32] = //
       {{
           // positions          //color
-          -0.1f, -0.2f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, // bottom left
-          0.1f,  -0.2f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, // bottom right
-          0.0f,  0.15f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f  // top
+          0.1f,  0.2f,  0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, // top right
+          0.1f,  -0.2f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, // bottom right
+          -0.1f, -0.2f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, // bottom left
+          -0.1f, 0.2f,  0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, // top left
       }};
+
+  unsigned int indices[] = {
+      0, 1, 3, // first triang
+      1, 2, 3, // second triang
+  };
 
   // create a memory on the gpu where vertex data will be stored
   int BUFFERS = 1;
-  unsigned int vbos[BUFFERS], vaos[BUFFERS];
+  unsigned int vbos[BUFFERS], vaos[BUFFERS], ebos[BUFFERS];
   glGenBuffers(BUFFERS, vbos);
+  glGenBuffers(BUFFERS, ebos);
   glGenVertexArrays(BUFFERS, vaos);
 
   for (int i = 0; i < BUFFERS; i++) {
@@ -38,6 +45,10 @@ int main(int argc, char **argv) {
     glBindVertexArray(vaos[i]);
     glBindBuffer(GL_ARRAY_BUFFER, vbos[i]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertexArr[i]), vertexArr[i],
+                 GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebos[i]);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices,
                  GL_STATIC_DRAW);
 
     // Core OpenGL requires that a VAO should be used, to know what to do with
@@ -103,9 +114,8 @@ int main(int argc, char **argv) {
     shader->setFloat3f("colorOffset", offset, offset, offset);
 
     playGame(window, shader);
-
     glBindVertexArray(vaos[0]);
-    glDrawArrays(GL_TRIANGLES, 0, 3);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
     // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved
     // etc.)
