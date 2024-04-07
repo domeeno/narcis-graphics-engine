@@ -1,4 +1,4 @@
-#include "../include/glad/glad.h"
+#include "../../include/glad/glad.h"
 #include "cglfw.h"
 #include <cstdlib>
 

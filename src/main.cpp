@@ -1,7 +1,7 @@
 #include "../include/glad/glad.h"
 #include "./gl/shaders.h"
-#include "./lib/cglfw.h"
 #include "./lib/textures.h"
+#include "nge/Window/Window.hpp"
 
 #include <GL/gl.h>
 #include <GLFW/glfw3.h>
@@ -12,14 +12,13 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-int WINDOW_WIDTH = 1600;
-int WINDOW_HEIGHT = 900;
-const char *WINDOW_NAME = "Hello";
+u16 WINDOW_WIDTH = 1600;
+u16 WINDOW_HEIGHT = 900;
 
 int main(int argc, char **argv) {
 
-  GLFWwindow *window = initGlfwWindow(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_NAME,
-                                      3, 3, GLFW_OPENGL_CORE_PROFILE);
+  nge::Window *window = new nge::Window(WINDOW_WIDTH, WINDOW_HEIGHT);
+  window->Init();
 
   auto *shader = new Shader("src/shaders/coordinate_vs.glsl",
                             "src/shaders/texture_fs.glsl");
@@ -124,7 +123,7 @@ int main(int argc, char **argv) {
 
   // wireframe mode
   // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-  while (!glfwWindowShouldClose(window)) {
+  while (!glfwWindowShouldClose(window->GetWindow())) {
     glClearColor(0.2f, 0.2f, 0.2f, 1);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     double currentTime = glfwGetTime();
@@ -170,11 +169,12 @@ int main(int argc, char **argv) {
     // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved
     // etc.)
     glFlush();
-    glfwSwapBuffers(window);
+    glfwSwapBuffers(window->GetWindow());
     glfwPollEvents();
   }
 
   delete shader;
+  delete window;
 
   glDeleteVertexArrays(BUFFERS, vaos);
   glDeleteBuffers(BUFFERS, vbos);

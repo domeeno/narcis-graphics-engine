@@ -14,6 +14,7 @@ set(SOURCES
   "${SRC_DIR}/lib/stb_image.cpp"
   "${SRC_DIR}/lib/textures.cpp"
   "${SRC_DIR}/nge/Engine/AppEngine.cpp"
+  "${SRC_DIR}/nge/Window/Window.cpp"
   )
 
 add_executable(${PROJECT_NAME} ${SOURCES})
