@@ -3,7 +3,10 @@
 
 #include "../../../include/glad/glad.h"
 #include "../Utils/Utils.hpp"
+#include "KeyMap.hpp"
 #include <GLFW/glfw3.h>
+#include <functional>
+#include <unordered_map>
 
 namespace nge {
 
@@ -29,13 +32,23 @@ public:
   void SetMinor(u8 version);
 
   /**
-   * sets up everything for a glfwWindow
+   * Sets up everything for a glfwWindow
    */
   void Init();
 
+  /**
+   * Returns a GLFW window instance
+   */
   GLFWwindow *GetWindow() { return this->GlfwWindow; };
 
-  void RegisterKey();
+  /**
+   * Register a key and a function to be executed when this key was pressed
+   */
+  void RegisterKey(nge::KEYMAP key, std::function<void()> event);
+
+  /**
+   * Process Key Press events;
+   */
   void ProcessInput();
 
 private :
@@ -44,6 +57,8 @@ private :
   const char *Title;
   u16 Width, Height;
   u8 Minor, Major;
+  std::unordered_map<nge::KEYMAP, std::function<void()>> KeyEventMap;
+
 };
 
 } // namespace nge

@@ -1,6 +1,5 @@
 #include "Window.hpp"
-#include <GLFW/glfw3.h>
-#include <cstddef>
+#include "KeyMap.hpp"
 
 /**
  * callback function triggered by window resizing
@@ -37,6 +36,20 @@ void Window::SetMajor(u8 version) { this->Major = version; }
  * For GLFW Window manager setup in accordance with OpenGL version (minor)
  */
 void Window::SetMinor(u8 version) { this->Minor = version; }
+
+void Window::RegisterKey(nge::KEYMAP key, std::function<void()> event) {
+  this->KeyEventMap[key] = event;
+}
+
+void Window::ProcessInput() {
+
+  for (auto &it : this->KeyEventMap) {
+    if (glfwGetKey(this->GlfwWindow, static_cast<int>(it.first)) ==
+        GLFW_PRESS) {
+      it.second();
+    }
+  }
+}
 
 /**
  * sets up everything for a glfwWindow

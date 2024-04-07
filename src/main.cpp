@@ -1,6 +1,7 @@
 #include "../include/glad/glad.h"
 #include "./gl/shaders.h"
 #include "./lib/textures.h"
+#include "nge/Window/KeyMap.hpp"
 #include "nge/Window/Window.hpp"
 
 #include <GL/gl.h>
@@ -121,11 +122,21 @@ int main(int argc, char **argv) {
   double lastTime = glfwGetTime();
   int nbFrames = 0;
 
+  window->RegisterKey(nge::KEYMAP::_SPACE,
+                      []() -> void { std::cout << "SPACE" << std::endl; });
+  window->RegisterKey(nge::KEYMAP::_Q, [window]() -> void {
+    glfwSetWindowShouldClose(window->GetWindow(), true);
+    std::cout << "Quitting" << std::endl;
+  });
+
   // wireframe mode
   // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
   while (!glfwWindowShouldClose(window->GetWindow())) {
     glClearColor(0.2f, 0.2f, 0.2f, 1);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    window->ProcessInput();
+
     double currentTime = glfwGetTime();
     nbFrames++;
     if (currentTime - lastTime >=
