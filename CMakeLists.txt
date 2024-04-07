@@ -1,10 +1,11 @@
 cmake_minimum_required(VERSION 3.0)
 
-project(WallachiaStore)
+project(NarcisGE)
 
 find_package(glm CONFIG REQUIRED)
 
 set(SRC_DIR "${CMAKE_CURRENT_LIST_DIR}/src")
+
 set(SOURCES 
   "${SRC_DIR}/main.cpp" 
   "${SRC_DIR}/gl/glad.c"
@@ -12,6 +13,7 @@ set(SOURCES
   "${SRC_DIR}/lib/cglfw.cpp"
   "${SRC_DIR}/lib/stb_image.cpp"
   "${SRC_DIR}/lib/textures.cpp"
+  "${SRC_DIR}/nge/Engine/AppEngine.cpp"
   )
 
 add_executable(${PROJECT_NAME} ${SOURCES})
@@ -20,7 +22,6 @@ target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_LIST_DIR}/in
 
 target_link_libraries(${PROJECT_NAME}
   glfw 
-  GL 
   Xrandr 
   X11 
   rt 
