@@ -13,7 +13,7 @@ namespace nge {
 class Window : NoCopy {
 public:
   static Window *Get() { return Instance; };
-  Window(u16 width, u16 height);
+  Window();
   ~Window();
 
   /**
@@ -21,6 +21,23 @@ public:
    */
   void SetTitle(const char *title);
 
+
+  /**
+   * Sets the window title
+   */
+  void SetFulscreen(u8 fullscreen) {
+    if(!fullscreen) {
+      this->GlfwMonitor = NULL;
+    } else {
+      this->GlfwMonitor = glfwGetPrimaryMonitor();
+    }
+  }
+
+  u16 GetWidth() { return Width; };
+  u16 GetHeight() { return Height; };
+
+  void SetWidth(u16 width) { this->Width = width; };
+  void SetHeight(u16 height) { this->Height = height; };
   /**
    * For GLFW Window manager setup in accordance with OpenGL version (major)
    */
@@ -51,14 +68,14 @@ public:
    */
   void ProcessInput();
 
-private :
+private:
   static Window *Instance;
   GLFWwindow *GlfwWindow;
+  GLFWmonitor *GlfwMonitor;
   const char *Title;
   u16 Width, Height;
   u8 Minor, Major;
   std::unordered_map<nge::KEYMAP, std::function<void()>> KeyEventMap;
-
 };
 
 } // namespace nge

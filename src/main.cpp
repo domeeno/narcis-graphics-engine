@@ -13,12 +13,9 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-u16 WINDOW_WIDTH = 1600;
-u16 WINDOW_HEIGHT = 900;
-
 int main(int argc, char **argv) {
 
-  nge::Window *window = new nge::Window(WINDOW_WIDTH, WINDOW_HEIGHT);
+  nge::Window *window = new nge::Window();
   window->Init();
 
   auto *shader = new Shader("src/shaders/coordinate_vs.glsl",
@@ -162,7 +159,7 @@ int main(int argc, char **argv) {
 
     view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
     projection = glm::perspective(
-        glm::radians(45.0f), (float)WINDOW_WIDTH / WINDOW_HEIGHT, 0.1f, 100.0f);
+        glm::radians(45.0f), (float)window->GetWidth() / window->GetHeight(), 0.1f, 100.0f);
 
     unsigned int modelLoc = glGetUniformLocation(shader->id, "model");
     unsigned int viewLoc = glGetUniformLocation(shader->id, "view");

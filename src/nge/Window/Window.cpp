@@ -1,5 +1,6 @@
 #include "Window.hpp"
-#include "KeyMap.hpp"
+#include <GLFW/glfw3.h>
+#include <iostream>
 
 /**
  * callback function triggered by window resizing
@@ -12,12 +13,36 @@ static void framebuffer_size_callback(GLFWwindow *window, int width,
 namespace nge {
 Window *Window::Instance = nullptr;
 
-Window::Window(u16 width, u16 height) {
-  this->Width = width;
-  this->Height = height;
+Window::Window() {
   this->Major = 3;
   this->Minor = 3;
   this->Title = "NarcisGE";
+
+  if (!glfwInit()) {
+    return;
+  }
+
+  /**
+   * for glfw to know more about the context and adjust its functionality
+   * accordingly
+   */
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, this->Major);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, this->Minor);
+
+  /**
+   * access to a smaller subset of OpenGL features without backwards-compatible
+   * features
+   */
+  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+  this->GlfwMonitor = glfwGetPrimaryMonitor();
+
+  auto mode = glfwGetVideoMode(this->GlfwMonitor);
+
+  std::cout << this->GlfwMonitor << std::endl;
+
+  this->Width = mode->width;
+  this->Height = mode->height;
 }
 
 Window::~Window() {}
@@ -55,25 +80,8 @@ void Window::ProcessInput() {
  * sets up everything for a glfwWindow
  */
 void Window::Init() {
-  if (!glfwInit()) {
-    return;
-  }
-
-  /**
-   * for glfw to know more about the context and adjust its functionality
-   * accordingly
-   */
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, this->Major);
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, this->Minor);
-
-  /**
-   * access to a smaller subset of OpenGL features without backwards-compatible
-   * features
-   */
-  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
   this->GlfwWindow =
-      glfwCreateWindow(this->Width, this->Height, this->Title, NULL, NULL);
+      glfwCreateWindow(this->Width, this->Height, this->Title, this->GlfwMonitor, NULL);
 
   if (!this->GlfwWindow) {
     glfwTerminate();
