@@ -2,8 +2,7 @@
 #define ENGINE_APP_ENGINE_H_
 
 #include "../Utils/NoCopy.hpp"
-
-#include <string>
+#include "../Window/Window.hpp"
 
 namespace nge {
 
@@ -14,12 +13,15 @@ class AppEngine : NoCopy {
 
 public:
   static AppEngine *Get() { return Instance; }
-  explicit AppEngine(std::string projectName);
+  explicit AppEngine();
+
+  Window *GetWindow() { return this->WindowManager; };
 
   ~AppEngine();
 
 private:
   static AppEngine *Instance;
+  Window *WindowManager;
 };
 } // namespace nge
 

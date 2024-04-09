@@ -1,6 +1,7 @@
 #include "../include/glad/glad.h"
 #include "./gl/shaders.h"
 #include "./lib/textures.h"
+#include "nge/Engine/AppEngine.hpp"
 #include "nge/Window/KeyMap.hpp"
 #include "nge/Window/Window.hpp"
 
@@ -14,8 +15,9 @@
 #include <glm/gtc/type_ptr.hpp>
 
 int main(int argc, char **argv) {
-
-  nge::Window *window = new nge::Window();
+  nge::AppEngine *nge = new nge::AppEngine();
+  nge::Window *window = nge->GetWindow();
+  window->SetTitle("Cube");
   window->Init();
 
   auto *shader = new Shader("src/shaders/coordinate_vs.glsl",
