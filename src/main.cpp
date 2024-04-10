@@ -1,7 +1,7 @@
 #include "../include/glad/glad.h"
-#include "./gl/shaders.h"
 #include "./lib/textures.h"
 #include "nge/Engine/AppEngine.hpp"
+#include "nge/Render/Shader.hpp"
 #include "nge/Window/KeyMap.hpp"
 #include "nge/Window/Window.hpp"
 
@@ -14,14 +14,19 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#define DEBUG
+
 int main(int argc, char **argv) {
   nge::AppEngine *nge = new nge::AppEngine();
   nge::Window *window = nge->GetWindow();
   window->SetTitle("Cube");
   window->Init();
 
-  auto *shader = new Shader("src/shaders/coordinate_vs.glsl",
-                            "src/shaders/texture_fs.glsl");
+  auto *shader = new nge::Shader();
+  shader->Vertex("src/shaders/coordinate_vs.glsl");
+  shader->Fragment("src/shaders/texture_fs.glsl");
+  shader->Build();
+
   glEnable(GL_DEPTH_TEST);
 
   float vertexArr[]{
@@ -149,8 +154,8 @@ int main(int argc, char **argv) {
       lastTime = currentTime;
     }
 
-    shader->use();
-    shader->setFloat3f("colorOffset", offset, offset, offset);
+    shader->Use();
+    shader->SetFloat3f("colorOffset", offset, offset, offset);
 
     glm::mat4 model = glm::mat4(1.0f);
     glm::mat4 view = glm::mat4(1.0f);
@@ -161,17 +166,18 @@ int main(int argc, char **argv) {
 
     view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
     projection = glm::perspective(
-        glm::radians(45.0f), (float)window->GetWidth() / window->GetHeight(), 0.1f, 100.0f);
+        glm::radians(45.0f), (float)window->GetWidth() / window->GetHeight(),
+        0.1f, 100.0f);
 
-    unsigned int modelLoc = glGetUniformLocation(shader->id, "model");
-    unsigned int viewLoc = glGetUniformLocation(shader->id, "view");
+    unsigned int modelLoc = shader->GetUniformLocation("model");
+    unsigned int viewLoc = shader->GetUniformLocation("view");
 
     glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
     glUniformMatrix4fv(viewLoc, 1, GL_FALSE, &view[0][0]);
     // note: currently we set the projection matrix each frame, but since the
     // projection matrix rarely changes it's often best practice to set it
     // outside the main loop only once.
-    shader->setMat4("projection", projection);
+    shader->SetMat4("projection", projection);
 
     glBindVertexArray(vaos[0]);
     glDrawArrays(GL_TRIANGLES, 0, 36);

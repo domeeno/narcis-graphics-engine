@@ -2,6 +2,7 @@
 #define UTILS_TYPES_H_
 
 #include <cstdint>
+#include <string>
 
 typedef float f32;
 typedef double f64;
@@ -14,6 +15,7 @@ typedef int16_t  i16;
 typedef int32_t  i32;
 typedef int64_t  i64;
 #define PI 3.141592f;
-
+typedef std::string GLSL;
+typedef const char* GLSLC;
 
 #endif // UTILS_TYPES_H_
