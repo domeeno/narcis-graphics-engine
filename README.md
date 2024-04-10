@@ -1,1 +1,1 @@
-# CLI GAME STORE.
+# Narcis - Graphics Engine library
