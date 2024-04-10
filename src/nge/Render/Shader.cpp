@@ -1,5 +1,4 @@
 #include "Shader.hpp"
-#include <iostream>
 
 namespace nge {
 Shader::Shader() {
@@ -57,8 +56,6 @@ GLuint Shader::Build() {
 }
 
 GLSL Shader::LoadShader(const char *filePath) {
-  std::cout << "::loading shader path: " << filePath << std::endl;
-
   GLSL shader;
 
   std::ifstream file;
@@ -86,8 +83,6 @@ GLuint Shader::Compile(GLSL shader, GLuint type) {
   ID = glCreateShader(type);
 
   GLSLC compilableShader = shader.c_str();
-
-  std::cout << compilableShader << std::endl;
 
   glShaderSource(ID, 1, &compilableShader, NULL);
   glCompileShader(ID);

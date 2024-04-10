@@ -4,7 +4,7 @@
 /**
  * Import if using more than one header file from utils
  */
-#include "NoCopy.hpp"
+#include "NonCopyable.hpp"
 #include "Types.hpp"
 
 #endif // UTILS_UTILS_H_

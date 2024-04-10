@@ -1,6 +1,4 @@
 #include "Window.hpp"
-#include <GLFW/glfw3.h>
-#include <iostream>
 
 /**
  * callback function triggered by window resizing
@@ -38,8 +36,6 @@ Window::Window() {
   this->GlfwMonitor = glfwGetPrimaryMonitor();
 
   auto mode = glfwGetVideoMode(this->GlfwMonitor);
-
-  std::cout << this->GlfwMonitor << std::endl;
 
   this->Width = mode->width;
   this->Height = mode->height;
@@ -80,8 +76,8 @@ void Window::ProcessInput() {
  * sets up everything for a glfwWindow
  */
 void Window::Init() {
-  this->GlfwWindow =
-      glfwCreateWindow(this->Width, this->Height, this->Title, this->GlfwMonitor, NULL);
+  this->GlfwWindow = glfwCreateWindow(this->Width, this->Height, this->Title,
+                                      this->GlfwMonitor, NULL);
 
   if (!this->GlfwWindow) {
     glfwTerminate();
