@@ -8,14 +8,14 @@ set(SRC_DIR "${CMAKE_CURRENT_LIST_DIR}/src")
 
 set(SOURCES 
   "${SRC_DIR}/main.cpp" 
-  "${SRC_DIR}/gl/glad.c"
-  "${SRC_DIR}/lib/cglfw.cpp"
-  "${SRC_DIR}/lib/stb_image.cpp"
+  "${SRC_DIR}/external/glad.c"
+  "${SRC_DIR}/external/stb_image.cpp"
   "${SRC_DIR}/lib/textures.cpp"
   "${SRC_DIR}/nge/Engine/AppEngine.cpp"
   "${SRC_DIR}/nge/Window/Window.cpp"
   "${SRC_DIR}/nge/Render/Render.cpp"
   "${SRC_DIR}/nge/Render/Shader.cpp"
+  "${SRC_DIR}/nge/Models/Point.cpp"
   )
 
 add_executable(${PROJECT_NAME} ${SOURCES})
