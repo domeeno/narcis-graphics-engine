@@ -21,10 +21,10 @@ typedef const char *GLSLC;
 namespace nge {
 
 typedef enum {
-  X,
-  Y,
-  Z,
+    XZ_PLANE,
+    XY_PLANE,
+    YZ_PLANE,
 } Plane;
-}
+} // namespace nge
 
 #endif // UTILS_TYPES_H_

@@ -5,7 +5,6 @@
 #include "../Utils/Types.hpp"
 #include "Model.hpp"
 #include "Point.hpp"
-#include "Point.hpp"
 
 #include <iostream>
 #include <vector>
@@ -13,7 +12,7 @@
 namespace nge {
 class Grid : public Model {
 public:
-  Grid(GLfloat span, GLuint columns);
+  Grid(GLfloat span, GLuint columns, Plane plane);
   void Draw() override;
   ~Grid();
 
