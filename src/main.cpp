@@ -31,7 +31,7 @@ int main(int argc, char **argv) {
   glEnable(GL_DEPTH_TEST);
 
   window->RegisterKey(nge::KEYMAP::_SPACE,
-                      []() -> void { std::cout << "SPACE" << std::endl; });
+                      [nge]() -> void { nge->SwitchView(); });
   window->RegisterKey(nge::KEYMAP::_Q, [window]() -> void {
     glfwSetWindowShouldClose(window->GetWindow(), true);
     std::cout << "Quitting" << std::endl;
@@ -39,19 +39,29 @@ int main(int argc, char **argv) {
 
   // nge->ViewPoints();
 
-  glm::mat4 translate = glm::mat4(1.0f);
+  // projection
   glm::mat4 projection = glm::mat4(1.0f);
   projection = glm::perspective(glm::radians(45.0f),
                                 (float)window->GetWidth() / window->GetHeight(),
                                 0.1f, 100.0f);
 
-  translate = glm::translate(translate, glm::vec3(0.0f, 0.0f, -3.0f));
-
-  unsigned int translateLoc = shader->GetUniformLocation("translate");
-  glUniformMatrix4fv(translateLoc, 1, GL_FALSE, &translate[0][0]);
   shader->SetMat4("projection", projection);
 
-  nge::Grid *g = new nge::Grid(16.0f, 64, nge::XZ_PLANE);
+  // translate
+  glm::mat4 translate = glm::mat4(1.0f);
+  translate = glm::translate(translate, glm::vec3(0.0f, 0.0f, -3.0f));
+  unsigned int translateLoc = shader->GetUniformLocation("translate");
+  glUniformMatrix4fv(translateLoc, 1, GL_FALSE, &translate[0][0]);
+
+  // rotate
+  glm::mat4 rotate = glm::mat4(1.0f);
+  rotate =
+      glm::rotate(rotate, glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
+  shader->SetMat4("rotate", rotate);
+  unsigned int rotateLoc = shader->GetUniformLocation("rotate");
+  glUniformMatrix4fv(rotateLoc, 1, GL_FALSE, glm::value_ptr(rotate));
+
+  nge::Grid *g = new nge::Grid(8.0f, 128, nge::XZ_PLANE);
 
   while (!glfwWindowShouldClose(window->GetWindow())) {
     glClearColor(0.2f, 0.2f, 0.2f, 1);

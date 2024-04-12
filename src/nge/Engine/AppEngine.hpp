@@ -12,21 +12,22 @@ namespace nge {
  * AppEngine - application lifecycle manager
  */
 class AppEngine : private NonCopyable {
-
 public:
   static AppEngine *Get() { return Instance; }
   explicit AppEngine();
+  ~AppEngine();
 
   Window *GetWindow() { return this->WindowManager; };
 
+  void SwitchView();
   void ViewWireframe() { glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);};
   void ViewPoints() { glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);};
   void ViewNormal() { glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);};
 
-  ~AppEngine();
 
 private:
   static AppEngine *Instance;
+  View view = NORMAL;
 
   Window *WindowManager;
   Render *RenderManager;

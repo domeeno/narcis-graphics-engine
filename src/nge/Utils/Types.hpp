@@ -19,12 +19,17 @@ typedef std::string GLSL;
 typedef const char *GLSLC;
 
 namespace nge {
-
 typedef enum {
     XZ_PLANE,
     XY_PLANE,
     YZ_PLANE,
 } Plane;
+
+typedef enum {
+  NORMAL,
+  POINT,
+  LINE,
+} View;
 } // namespace nge
 
 #endif // UTILS_TYPES_H_

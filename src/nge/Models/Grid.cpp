@@ -6,12 +6,17 @@ Grid::Grid(GLfloat span, GLuint columns, Plane plane) {
   std::cout << "span: " << step << " columns: " << columns << " step: " << step
             << std::endl;
 
-  for (f32 y = span; y >= -span; y -= step) {
-    for (f32 x = -span; x <= span; x += step) {
-      // std::cout << "{" << x << ", " << y << "};\t";
-      this->Points.push_back(new Point(x, y, -3.0f, 5.0f));
+  GLfloat pointSize = 2.0f;
+  for (f32 i = span; i >= -span; i -= step) {
+    for (f32 j = -span; j <= span; j += step) {
+      if (plane == XZ_PLANE) {
+        this->Points.push_back(new Point(j, 0.0f, i, pointSize));
+      } else if (plane == XY_PLANE) {
+        this->Points.push_back(new Point(j, i, 0.0f, pointSize));
+      } else if (plane == YZ_PLANE) {
+        this->Points.push_back(new Point(0.0f, j, i, pointSize));
+      }
     }
-  //    std::cout << std::endl;
   }
 }
 
