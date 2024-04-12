@@ -5,16 +5,16 @@
 #include "../Utils/Types.hpp"
 #include "Model.hpp"
 
-
 namespace nge {
 class Point : public Model {
 public:
-  Point(GLfloat x, GLfloat y);
+  Point(GLfloat x, GLfloat y, GLfloat z, GLfloat radius);
   void Draw() override;
   ~Point();
 
 private:
-  float Coords[2];
+  GLfloat Coords[3];
+  GLfloat Radius;
   GLuint vao;
 };
 } // namespace nge

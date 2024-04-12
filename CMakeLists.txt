@@ -16,6 +16,7 @@ set(SOURCES
   "${SRC_DIR}/nge/Render/Render.cpp"
   "${SRC_DIR}/nge/Render/Shader.cpp"
   "${SRC_DIR}/nge/Models/Point.cpp"
+  "${SRC_DIR}/nge/Models/Grid.cpp"
   )
 
 add_executable(${PROJECT_NAME} ${SOURCES})

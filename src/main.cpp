@@ -1,6 +1,7 @@
 #include "../include/glad/glad.h"
 #include "./lib/textures.h"
 #include "nge/Engine/AppEngine.hpp"
+#include "nge/Models/Grid.hpp"
 #include "nge/Models/Point.hpp"
 #include "nge/Render/Shader.hpp"
 #include "nge/Window/KeyMap.hpp"
@@ -39,9 +40,17 @@ int main(int argc, char **argv) {
 
   // wireframe mode
 
-  nge->ViewPoints();
+  // nge->ViewPoints();
+  glm::mat4 translate = glm::mat4(1.0f);
 
-  nge::Point *p = new nge::Point(0, 0);
+  translate = glm::translate(translate, glm::vec3(0.0f, 0.2f, 0.0f));
+
+  GLuint translateLoc = shader->GetUniformLocation("translate");
+
+  glUniformMatrix4fv(translateLoc, 1, GL_FALSE, glm::value_ptr(translate));
+  shader->SetMat4("translate", translate);
+
+  nge::Grid *g = new nge::Grid(1, 10);
 
   while (!glfwWindowShouldClose(window->GetWindow())) {
     glClearColor(0.2f, 0.2f, 0.2f, 1);
@@ -50,7 +59,7 @@ int main(int argc, char **argv) {
     window->ProcessInput();
 
     shader->Use();
-    p->Draw();
+    g->Draw();
 
     // draw
     glFlush();
